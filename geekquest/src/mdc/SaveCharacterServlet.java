@@ -8,6 +8,7 @@ import javax.servlet.http.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -19,6 +20,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -32,43 +34,55 @@ public class SaveCharacterServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException, ServletException {
 
-		// Userdaten holen
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		String userId = userService.getCurrentUser().getEmail();
-		
 		// Datastore initialisieren
-		DatastoreService datastore = DatastoreServiceFactory
-				.getDatastoreService();
+				DatastoreService datastore = DatastoreServiceFactory
+						.getDatastoreService();
 		
-		Entity character = new Entity("character", userId);
+		// use transactions - make sure to use retries
+		int retries = 3;
+		while (true) {
+		    Transaction txn = datastore.beginTransaction();
+		    try {
+		            	
+		    	// Userdaten holen
+				UserService userService = UserServiceFactory.getUserService();
+				String userId = userService.getCurrentUser().getEmail();
 
-		// Player mit Parametern aus dem JSP anlegen
-		// Player(UserID, Name, Charakterklasse, Health-Status)
-		
-		Player player = new Player(userId, req.getParameter("name"), req.getParameter("charclass"), req.getParameter("health"), setRandomScore());
-		// Mission 
-//		Mission mission = new Mission("destroy ring", false);
-		
+				Entity character = new Entity("character", userId);
 
-		character.setProperty("player_id", player.getId());
-		character.setProperty("player_name", player.getName());
-		character.setProperty("player_charclass", player.getCharclass());
-		character.setProperty("player_health", player.getHealth());
-		character.setProperty("player_score", player.getScore());
-		
+				// Player mit Parametern aus dem JSP anlegen
+				// Player(UserID, Name, Charakterklasse, Health-Status)
+				Player player = new Player(userId, req.getParameter("name"), req.getParameter("charclass"), req.getParameter("health"), setRandomScore(), req.getParameter("image-blob-key"));
 
-		// hard coded test mission
-//		character.setProperty("mission_description", mission.getDescription());
-//		character.setProperty("mission_isAccomplished",
-//				mission.isAccomplished());
+				character.setProperty("player_id", player.getId());
+				character.setProperty("player_name", player.getName());
+				character.setProperty("player_charclass", player.getCharclass());
+				character.setProperty("player_health", player.getHealth());
+				character.setProperty("player_score", player.getScore());
+				character.setProperty("image-blob-key", player.getImageBlobKey());
 
-		// set list of missions hard coded
-		setTemporaryMissions(character);
-		
-		datastore.put(character);
+				// set list of missions hard coded
+				setTemporaryMissions(character);
+				
+				datastore.put(character);
 
-		resp.sendRedirect("/geekquest");
+				resp.sendRedirect("/geekquest");
+		    	
+		        txn.commit();
+		        break;
+		    } catch (ConcurrentModificationException e) {
+		        if (retries == 0) {
+		            throw e;
+		        }
+		        // Allow retry to occur
+		        --retries;
+		        System.out.println("Transaction - ConcurrentModificationException");
+		    } finally {
+		        if (txn.isActive()) {
+		            txn.rollback();
+		        }
+		    }
+		}
 		
 	}
 	

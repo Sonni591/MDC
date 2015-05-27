@@ -183,7 +183,7 @@ public class LocalHighRepDatastoreTestHighestScore extends TestCase {
 		long highestScore = GeekQuestUtils.getHighestScore();
 		
 		Player player = new Player("jUnitTest@frodo.com", "Frodo", "Hobbit",
-				"100", highestScore+1);
+				"100", highestScore+1, "");
 
 		character.setProperty("player_id", player.getId());
 		character.setProperty("player_name", player.getName());
@@ -205,7 +205,7 @@ public class LocalHighRepDatastoreTestHighestScore extends TestCase {
 		long highestScore = GeekQuestUtils.getHighestScore();
 		
 		Player player = new Player("jUnitTest@frodo.com", "Frodo", "Hobbit",
-				"100", highestScore+1);
+				"100", highestScore+1, "");
 
 		character.setProperty("player_id", player.getId());
 		character.setProperty("player_name", player.getName());
@@ -273,7 +273,7 @@ public class LocalHighRepDatastoreTestHighestScore extends TestCase {
 		long highestScore = GeekQuestUtils.getHighestScore();
 		
 		Player player = new Player("test" + i + "@junit.com", "testCharacter"+i, "Hobbit",
-				"100", i);
+				"100", i, "");
 
 		character.setProperty("player_id", player.getId());
 		character.setProperty("player_name", player.getName());

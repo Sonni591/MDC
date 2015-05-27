@@ -91,7 +91,7 @@ public class GeekquestServlet extends HttpServlet {
 							existingCharacter.getProperty("player_charclass")
 									.toString(), health_value,
 							(long) existingCharacter
-									.getProperty("player_score"));
+									.getProperty("player_score"),"");
 					// Mission mission = new Mission(existingCharacter
 					// .getProperty("mission_description").toString(),
 					// (Boolean) existingCharacter

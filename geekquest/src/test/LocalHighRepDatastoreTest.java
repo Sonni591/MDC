@@ -118,7 +118,7 @@ public class LocalHighRepDatastoreTest extends TestCase {
 		Entity character = new Entity("character", "jUnitTest@frodo.com");
 
 		Player player = new Player("jUnitTest@frodo.com", "Frodo", "Hobbit",
-				"100", 9999);
+				"100", 9999, "");
 
 		character.setProperty("player_id", player.getId());
 		character.setProperty("player_name", player.getName());

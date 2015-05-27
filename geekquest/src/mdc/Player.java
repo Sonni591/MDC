@@ -8,15 +8,17 @@ public class Player {
 	private String charclass;
 	private String health;
 	private long score;
+	private String imageBlobKey;
 		
 // Constructor
-	public Player(String id, String name, String charclass, String health, long score) {
+	public Player(String id, String name, String charclass, String health, long score, String imageBlobKey) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.charclass = charclass;
 		this.health = health;
 		this.score = score;
+		this.imageBlobKey = imageBlobKey;
 	}
 
 // Getters and Setters
@@ -51,6 +53,14 @@ public class Player {
 
 	public void setScore(long score) {
 		this.score = score;
+	}
+
+	public String getImageBlobKey() {
+		return imageBlobKey;
+	}
+
+	public void setImageBlobKey(String imageBlobKey) {
+		this.imageBlobKey = imageBlobKey;
 	}
 
 // Functions
